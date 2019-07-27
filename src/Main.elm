@@ -5,6 +5,7 @@ import Css exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (..)
+import Http exposing (..)
 import Json.Decode exposing (..)
 
 
@@ -46,6 +47,7 @@ type alias Model =
   { lighting: Lighting
   , query: String
   , searchStatus: SearchStatus
+  , searchResults: Maybe TypeResult
   }
 
 
@@ -70,6 +72,27 @@ type SearchStatus
   | Success
 
 
+type alias TypeResult =
+  { typeInfo: TypeInfo
+  -- , relationships: TypeRelationships  
+  }
+
+
+type alias TypeInfo =
+  { id: String
+  , name: String    
+  }
+
+
+type alias TypeRelationships =
+  { effectiveAgainst: List TypeInfo
+  , weakAgainst: List TypeInfo
+  , ineffectiveAgainst: List TypeInfo
+  , resistantTo: List TypeInfo
+  , counters: List TypeInfo
+  }
+
+
 init : Json.Decode.Value -> ( Model, Cmd Msg )
 init state =
   let
@@ -86,6 +109,7 @@ defaultModel lighting =
   { lighting = lighting
   , query = ""
   , searchStatus = Success
+  , searchResults = Nothing
   }
 
 
@@ -140,6 +164,7 @@ lightColors =
 type Msg
   = UpdateQuery String
   | Search
+  | SearchResult (Result Http.Error TypeApiResult)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -148,7 +173,20 @@ update msg model =
     UpdateQuery query ->
       ( { model | query = query }, Cmd.none )
     Search ->
-      ( { model | searchStatus = Loading }, Cmd.none )
+      ( { model | searchStatus = Loading }
+      , searchType model.query
+      )
+    SearchResult result ->
+      case result of
+        Ok typeResult ->
+          ( { model
+            | searchStatus = Success
+            , searchResults = Just (mapApiResult typeResult)
+            }
+          , Cmd.none
+          )
+        Err _ ->
+          ( { model | searchStatus = Failure }, Cmd.none )
 
 
 
@@ -233,7 +271,16 @@ failureSearchResults model =
 
 successSearchResults : Model -> Html Msg
 successSearchResults model =
-  div [] [ text ("Results for " ++ model.query) ]
+  case model.searchResults of
+    Nothing ->
+      text ""
+    Just results ->
+      div
+        []
+        [ text ("Results for " ++ model.query)
+        , text results.typeInfo.id
+        , text results.typeInfo.name
+        ]
 
 
 onClick : msg -> Html.Styled.Attribute msg
@@ -245,4 +292,37 @@ onClick msg =
       , stopPropagation = True
       }
     )
+
+
+-- HTTP
+
+
+type alias TypeApiResult =
+  { id: String
+  , name: String
+  -- , relationships: List TypeApiResult    
+  }
+
+
+mapApiResult : TypeApiResult -> TypeResult
+mapApiResult apiResult =
+  { typeInfo = { id = apiResult.id, name = apiResult.name }
+  -- , relationships = []
+  }
+
+
+searchType : String -> Cmd Msg
+searchType t =
+  Http.get
+    { url = "https://pokemon-type-api.herokuapp.com/type/" ++ t
+    , expect = Http.expectJson SearchResult typeDecoder
+    }
+
+
+typeDecoder : Decoder TypeApiResult
+typeDecoder =
+  Json.Decode.map2 TypeApiResult
+    (field "type" string)
+    (field "name" string)
+
 
