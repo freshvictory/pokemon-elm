@@ -44,6 +44,8 @@ updateWithStorage msg model =
 
 type alias Model =
   { lighting: Lighting
+  , query: String
+  , searchStatus: SearchStatus
   }
 
 
@@ -62,6 +64,12 @@ type alias Colors =
   }
 
 
+type SearchStatus
+  = Loading
+  | Failure
+  | Success
+
+
 init : Json.Decode.Value -> ( Model, Cmd Msg )
 init state =
   let
@@ -76,6 +84,8 @@ init state =
 defaultModel : Lighting -> Model
 defaultModel lighting =
   { lighting = lighting
+  , query = ""
+  , searchStatus = Success
   }
 
 
@@ -128,12 +138,17 @@ lightColors =
 
 
 type Msg
-  = NoOp
+  = UpdateQuery String
+  | Search
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  ( model, Cmd.none )
+  case msg of
+    UpdateQuery query ->
+      ( { model | query = query }, Cmd.none )
+    Search ->
+      ( { model | searchStatus = Loading }, Cmd.none )
 
 
 
@@ -146,6 +161,88 @@ view model =
     colors = colorValues model.lighting
   in
     div
-      [ css [ backgroundColor colors.background ] ]
-      [ h1 [] [ text "Your Elm App is different!" ]
+      [ css
+        [ backgroundColor colors.background
+        , color colors.text
+        , padding (px 15)
+        ]
       ]
+      [ header model
+      , searchView model
+      ]
+
+
+header : Model -> Html Msg
+header model =
+  h1
+    [ css
+      [ textAlign center
+      ]
+    ]
+    [ text "Search for Pokemon!" ]
+
+
+searchView : Model -> Html Msg
+searchView model =
+  div []
+    [ searchBox model
+    , searchResults model
+    ]
+
+
+searchBox : Model -> Html Msg
+searchBox model =
+  let
+    colors = colorValues model.lighting
+  in
+    Html.Styled.form
+      []
+      [ input
+          [ css
+              []
+          , placeholder "Search for a Pokemon type"
+          , Html.Styled.Attributes.value model.query
+          , onInput UpdateQuery
+          ]
+          []
+      , button
+        [ type_ "submit"
+        , onClick Search
+        ]
+        [ text "Search" ]
+      ]
+
+
+searchResults : Model -> Html Msg
+searchResults model =
+  case model.searchStatus of
+    Loading -> loadingSearchResults model
+    Failure -> failureSearchResults model
+    Success -> successSearchResults model
+
+
+loadingSearchResults : Model -> Html Msg
+loadingSearchResults model =
+  div [] [ text ("Loading " ++ model.query) ]
+
+
+failureSearchResults : Model -> Html Msg
+failureSearchResults model =
+  div [] [ text "Could not load results. Please try again later." ]
+
+
+successSearchResults : Model -> Html Msg
+successSearchResults model =
+  div [] [ text ("Results for " ++ model.query) ]
+
+
+onClick : msg -> Html.Styled.Attribute msg
+onClick msg =
+  custom "click"
+    ( Json.Decode.succeed
+      { message = msg
+      , preventDefault = True
+      , stopPropagation = True
+      }
+    )
+
