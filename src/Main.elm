@@ -116,14 +116,14 @@ defaultModel lighting =
 modelFromState : State -> Model
 modelFromState state =
   let
-    lighting = (if state.lighting == "dark" then Dark else Light)
+    lighting = if state.lighting == "dark" then Dark else Light
   in
     defaultModel lighting
 
 
 stateFromModel : Model -> State
 stateFromModel model =
-  { lighting = (if model.lighting == Dark then "dark" else "light")
+  { lighting = if model.lighting == Dark then "dark" else "light"
   }
 
 
@@ -145,17 +145,17 @@ colorValues lighting =
 
 darkColors : Colors
 darkColors =
-  { background = (hex "000")
-  , menuBackground = (hex "333")
-  , text = (hex "CCC")
+  { background = hex "000"
+  , menuBackground = hex "333"
+  , text = hex "CCC"
   }
 
 
 lightColors : Colors
 lightColors =
-  { background = (hex "FFF")
-  , menuBackground = (hex "EEE")
-  , text = (hex "000")
+  { background = hex "FFF"
+  , menuBackground = hex "EEE"
+  , text = hex "000"
   }
 
 ---- UPDATE ----
@@ -234,7 +234,10 @@ searchBox model =
     colors = colorValues model.lighting
   in
     Html.Styled.form
-      []
+      [ css
+        [ Css.width (pct 100)
+        ]
+      ]
       [ input
           [ css
               []
@@ -311,10 +314,15 @@ mapApiResult apiResult =
   }
 
 
+normalizeQuery : String -> String
+normalizeQuery q =
+  String.toLower (String.trim q)
+
+
 searchType : String -> Cmd Msg
 searchType t =
   Http.get
-    { url = "https://pokemon-type-api.herokuapp.com/type/" ++ t
+    { url = "https://pokemon-type-api.herokuapp.com/type/" ++ normalizeQuery t
     , expect = Http.expectJson SearchResult typeDecoder
     }
 
