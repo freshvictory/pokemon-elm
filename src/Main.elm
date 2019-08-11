@@ -205,13 +205,13 @@ view model =
         , padding (px 15)
         ]
       ]
-      [ header model
+      [ header
       , searchView model
       ]
 
 
-header : Model -> Html Msg
-header model =
+header : Html Msg
+header =
   h1
     [ css
       [ textAlign center
@@ -236,6 +236,7 @@ searchBox model =
     Html.Styled.form
       [ css
         [ Css.width (pct 100)
+        , color colors.text
         ]
       ]
       [ input
@@ -258,7 +259,7 @@ searchResults : Model -> Html Msg
 searchResults model =
   case model.searchStatus of
     Loading -> loadingSearchResults model
-    Failure -> failureSearchResults model
+    Failure -> failureSearchResults
     Success -> successSearchResults model
 
 
@@ -267,8 +268,8 @@ loadingSearchResults model =
   div [] [ text ("Loading " ++ model.query) ]
 
 
-failureSearchResults : Model -> Html Msg
-failureSearchResults model =
+failureSearchResults : Html Msg
+failureSearchResults =
   div [] [ text "Could not load results. Please try again later." ]
 
 
@@ -295,6 +296,7 @@ onClick msg =
       , stopPropagation = True
       }
     )
+
 
 
 -- HTTP
