@@ -79,7 +79,7 @@ type SearchStatus
 
 type alias TypeResult =
   { typeInfo: TypeInfo
-  -- , relationships: TypeRelationships  
+  , relationships: TypeRelationships
   }
 
 
@@ -326,11 +326,60 @@ successSearchResults model =
       text ""
     Just results ->
       div
-        []
-        [ text ("Results for " ++ model.query)
-        , text results.typeInfo.id
-        , text results.typeInfo.name
+        [ css [ marginTop (px 20) ] ]
+        [ resultsTable results.relationships
         ]
+
+
+resultsTable : TypeRelationships -> Html Msg
+resultsTable relationships =
+  Html.Styled.table
+    [ css
+      [ borderCollapse collapse
+      , tableLayout fixed
+      , color (hex "111")
+      ]
+    ]
+    [ tr [ css [ backgroundColor (hex "69c423") ] ]
+      [ td [ css tableDataStyle ] [ text "Effective against" ]
+      , displayResults relationships.effectiveAgainst
+      ]
+    , tr [ css [ backgroundColor (hex "f9ed63") ] ]
+      [ td [ css tableDataStyle ] [ text "Weak against" ]
+      , displayResults relationships.weakAgainst
+      ]
+    , tr [ css [ backgroundColor (hex "f78360") ] ]
+      [ td [ css tableDataStyle ] [ text "Ineffective against" ]
+      , displayResults relationships.ineffectiveAgainst
+      ]
+    , tr [ css [ backgroundColor (hex "20c0f9") ] ]
+      [ td [ css tableDataStyle ] [ text "Resistant to" ]
+      , displayResults relationships.resistantTo
+      ]
+    , tr [ css [ backgroundColor (hex "ffa500") ] ]
+      [ td [ css tableDataStyle ] [ text "Counters" ]
+      , displayResults relationships.counters
+      ]
+    ]
+
+
+tableDataStyle : List Style
+tableDataStyle =
+  [ padding (px 20)
+  , textAlign center
+  ]
+
+
+displayResults : List TypeInfo -> Html Msg
+displayResults types =
+  td [ css tableDataStyle ]
+    [ text (
+      if List.isEmpty types then
+        "--"
+      else
+        String.join ", " (List.map (\t -> t.name) types)
+      )
+    ]
 
 
 footer : Model -> Html Msg
@@ -507,14 +556,35 @@ buttonStyle model =
 type alias TypeApiResult =
   { id: String
   , name: String
-  -- , relationships: List TypeApiResult    
+  , relationships: TypeRelationship
+  }
+
+
+type alias TypeRelationship =
+  { resistantTo: List TypeApiShorthand
+  , counters: List TypeApiShorthand
+  , effectiveAgainst: List TypeApiShorthand
+  , weakAgainst: List TypeApiShorthand
+  , ineffectiveAgainst: List TypeApiShorthand
+  }
+
+
+type alias TypeApiShorthand =
+  { id: String
+  , name: String
   }
 
 
 mapApiResult : TypeApiResult -> TypeResult
 mapApiResult apiResult =
   { typeInfo = { id = apiResult.id, name = apiResult.name }
-  -- , relationships = []
+  , relationships =
+    { effectiveAgainst = apiResult.relationships.effectiveAgainst
+    , weakAgainst = apiResult.relationships.weakAgainst
+    , ineffectiveAgainst = apiResult.relationships.ineffectiveAgainst
+    , resistantTo = apiResult.relationships.resistantTo
+    , counters = apiResult.relationships.counters
+    }
   }
 
 
@@ -533,7 +603,25 @@ searchType t =
 
 typeDecoder : Decoder TypeApiResult
 typeDecoder =
-  Json.Decode.map2 TypeApiResult
+  Json.Decode.map3 TypeApiResult
+    (field "type" string)
+    (field "name" string)
+    (field "relationships" typeRelationshipDecoder)
+
+
+typeRelationshipDecoder : Decoder TypeRelationship
+typeRelationshipDecoder =
+  Json.Decode.map5 TypeRelationship
+    (field "resistantTo" (Json.Decode.list typeShorthandDecoder))
+    (field "counters" (Json.Decode.list typeShorthandDecoder))
+    (field "effectiveAgainst" (Json.Decode.list typeShorthandDecoder))
+    (field "weakAgainst" (Json.Decode.list typeShorthandDecoder))
+    (field "ineffectiveAgainst" (Json.Decode.list typeShorthandDecoder))
+
+
+typeShorthandDecoder : Decoder TypeApiShorthand
+typeShorthandDecoder =
+  Json.Decode.map2 TypeApiShorthand
     (field "type" string)
     (field "name" string)
 
