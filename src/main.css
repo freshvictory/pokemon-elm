@@ -34,3 +34,12 @@ button {
 button:active {
   background: transparent;
 }
+
+input {
+  font-size: inherit;
+  font: inherit;
+}
+
+input:focus {
+  outline: none;
+}

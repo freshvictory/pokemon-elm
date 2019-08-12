@@ -262,13 +262,19 @@ searchBox model =
         [ Css.width (pct 100)
         , color colors.text
         , displayFlex
-        , justifyContent center
+        , alignItems center
+        , batch (menuBorder model)
+        , padding (px 2)
         ]
       , onSubmit Search
       ]
       [ input
           [ css
-              []
+            [ Css.width (pct 100)
+            , paddingLeft (px 8)
+            , border zero
+            , borderRadius (px 18)
+            ]
           , placeholder "Search for a Pokemon type"
           , Html.Styled.Attributes.value model.query
           , onInput UpdateQuery
@@ -277,7 +283,10 @@ searchBox model =
           []
       , button
         [ type_ "submit"
-        , css (buttonStyle model)
+        , css
+          [ batch (buttonStyle model)
+          , borderRadius (px 18)
+          ]
         ]
         [ text "Search" ]
       ]
