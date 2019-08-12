@@ -261,7 +261,10 @@ searchBox model =
       [ css
         [ Css.width (pct 100)
         , color colors.text
+        , displayFlex
+        , justifyContent center
         ]
+      , onSubmit Search
       ]
       [ input
           [ css
@@ -269,11 +272,12 @@ searchBox model =
           , placeholder "Search for a Pokemon type"
           , Html.Styled.Attributes.value model.query
           , onInput UpdateQuery
+          , Html.Styled.Attributes.required True
           ]
           []
       , button
         [ type_ "submit"
-        , onClick Search
+        , css (buttonStyle model)
         ]
         [ text "Search" ]
       ]
@@ -438,17 +442,6 @@ buttonStyle model =
   , padding2 (px 6) (px 20)
   , borderRadius (px 10)
   ]
-
-
-onClick : msg -> Html.Styled.Attribute msg
-onClick msg =
-  custom "click"
-    ( Json.Decode.succeed
-      { message = msg
-      , preventDefault = True
-      , stopPropagation = True
-      }
-    )
 
 
 
