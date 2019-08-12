@@ -17,3 +17,20 @@ body {
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
+
+button {
+  cursor: pointer;
+  font-size: inherit;
+  font: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+}
+
+button:active {
+  background: transparent;
+}

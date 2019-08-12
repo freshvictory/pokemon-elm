@@ -1,6 +1,7 @@
 port module Main exposing (..)
 
 import Browser
+import Browser.Navigation
 import Css exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
@@ -48,6 +49,7 @@ type alias Model =
   , query: String
   , searchStatus: SearchStatus
   , searchResults: Maybe TypeResult
+  , showSettings: Bool
   }
 
 
@@ -63,6 +65,8 @@ type alias Colors =
   { background: Color
   , menuBackground: Color
   , text: Color
+  , border: Color
+  , buttonBackground: Color
   }
 
 
@@ -110,6 +114,7 @@ defaultModel lighting =
   , query = ""
   , searchStatus = Success
   , searchResults = Nothing
+  , showSettings = False
   }
 
 
@@ -146,8 +151,10 @@ colorValues lighting =
 darkColors : Colors
 darkColors =
   { background = hex "000"
-  , menuBackground = hex "333"
+  , menuBackground = hex "111"
   , text = hex "CCC"
+  , border = hex "333"
+  , buttonBackground = hex "444"
   }
 
 
@@ -156,6 +163,8 @@ lightColors =
   { background = hex "FFF"
   , menuBackground = hex "EEE"
   , text = hex "000"
+  , border = hex "CCC"
+  , buttonBackground = hex "CCC"
   }
 
 ---- UPDATE ----
@@ -165,6 +174,9 @@ type Msg
   = UpdateQuery String
   | Search
   | SearchResult (Result Http.Error TypeApiResult)
+  | ChangeLighting Bool
+  | Update
+  | ToggleSettings Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -187,6 +199,12 @@ update msg model =
           )
         Err _ ->
           ( { model | searchStatus = Failure }, Cmd.none )
+    ChangeLighting checked ->
+      ( { model | lighting = if checked then Light else Dark }, Cmd.none )
+    Update ->
+      ( model, Browser.Navigation.reloadAndSkipCache )
+    ToggleSettings checked  ->
+      ( { model | showSettings = checked }, Cmd.none )
 
 
 
@@ -203,10 +221,16 @@ view model =
         [ backgroundColor colors.background
         , color colors.text
         , padding (px 15)
+        , Css.height (pct 100)
         ]
       ]
       [ header
       , searchView model
+      , if model.showSettings then
+          shield (ToggleSettings False) False
+        else
+          text ""
+      , viewSettingsContainer model
       ]
 
 
@@ -285,6 +309,135 @@ successSearchResults model =
         , text results.typeInfo.id
         , text results.typeInfo.name
         ]
+
+
+viewSettingsContainer : Model -> Html Msg
+viewSettingsContainer model =
+  div
+    [ css
+      [ position absolute
+      , bottom zero
+      , right zero
+      , margin (px 20)
+      , textAlign right
+      ]
+    ]
+    [ if model.showSettings then
+        viewSettings model
+      else
+        text ""
+    , viewSettingsToggle model
+    ]
+
+
+viewSettingsToggle : Model -> Html Msg
+viewSettingsToggle model =
+  labeledCheckbox
+    model
+    "settings-toggle"
+    "Settings"
+    [  ]
+    [  ]
+    model.showSettings
+    ToggleSettings
+
+
+viewSettings : Model -> Html Msg
+viewSettings model =
+  let colors = colorValues model.lighting in
+  div
+    [ css
+      [ backgroundColor colors.menuBackground
+      , padding (px 10)
+      , marginBottom (px 10)
+      , Css.width (px 150)
+      , textAlign left
+      , batch (menuBorder model)
+      ]
+    ]
+    [ labeledCheckbox
+        model
+        "lighting"
+        (if model.lighting == Light then "Dark mode" else "Light mode")
+        [  ]
+        [  ]
+        (model.lighting == Light)
+        ChangeLighting
+    , hr [ css
+           [ display block
+           , Css.height (px 1)
+           , border zero
+           , borderTop3 (px 1) solid colors.border
+           , margin2 (px 10) zero
+           , padding zero
+           ]
+          ] []
+    , button
+      [ css [ Css.width (pct 100), batch (buttonStyle model) ]
+      , onClick Update
+      ]
+      [ text "Reload" ]
+    ]
+
+
+shield : Msg -> Bool -> Html Msg
+shield msg dim =
+  div 
+    [ css
+      [ position absolute
+      , left (px 0)
+      , top (px 0)
+      , right (px 0)
+      , bottom (px 0)
+      , if dim then
+          batch
+          [ backgroundColor (hex "#111")
+          , opacity (num 0.2)
+          ]
+        else
+          batch []
+      ]
+    , onClick msg
+    ]
+    []
+
+
+labeledCheckbox : Model -> String -> String -> List Style -> List Style -> Bool -> (Bool -> Msg) -> Html Msg
+labeledCheckbox model elemid elemlabel elemCss labelCss isChecked msg =
+  let
+    colors = colorValues model.lighting
+  in
+    div [] 
+      [ input
+        [ type_ "checkbox"
+        , id elemid
+        , css (batch [ display none ] :: elemCss)
+        , Html.Styled.Attributes.checked isChecked
+        , onCheck msg
+        ] []
+      , label 
+        [ css (batch [ color colors.text ] :: labelCss)
+        , for elemid
+        ]
+        [ text elemlabel ]
+      ]
+
+
+menuBorder : Model -> List Style
+menuBorder model =
+  let colors = colorValues model.lighting in
+  [ border3 (px 1) solid colors.border
+  , borderRadius (px 20)
+  ]
+
+
+buttonStyle : Model -> List Style
+buttonStyle model =
+  let colors = colorValues model.lighting in
+  [ backgroundColor colors.buttonBackground
+  , padding2 (px 6) (px 20)
+  , borderRadius (px 10)
+  ]
 
 
 onClick : msg -> Html.Styled.Attribute msg
