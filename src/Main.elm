@@ -3,6 +3,7 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation
 import Css exposing (..)
+import Css.Transitions exposing (transition, linear, easeInOut)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (..)
@@ -230,18 +231,27 @@ view model =
           shield (ToggleSettings False) False
         else
           text ""
-      , viewSettingsContainer model
+      , viewSettings model
+      , footer model
       ]
 
 
 header : Html Msg
 header =
-  h1
+  div
     [ css
-      [ textAlign center
+      [ borderBottom3 (px 1) solid (hex "e6bc2f")
+      , paddingTop (px 22)
+      , paddingBottom (px 20)
+      , margin zero
+      , marginBottom (px 25)
       ]
     ]
-    [ text "Search for Pokemon!" ]
+    [ img
+      [ src "logo-pokemon.png"
+      , css [ display block, margin2 zero auto ]
+      ] []
+    ]
 
 
 searchView : Model -> Html Msg
@@ -262,9 +272,9 @@ searchBox model =
         [ Css.width (pct 100)
         , color colors.text
         , displayFlex
-        , alignItems center
         , batch (menuBorder model)
-        , padding (px 2)
+        , padding (px 3)
+        , boxSizing borderBox
         ]
       , onSubmit Search
       ]
@@ -273,7 +283,6 @@ searchBox model =
             [ Css.width (pct 100)
             , paddingLeft (px 8)
             , border zero
-            , borderRadius (px 18)
             ]
           , placeholder "Search for a Pokemon type"
           , Html.Styled.Attributes.value model.query
@@ -285,7 +294,7 @@ searchBox model =
         [ type_ "submit"
         , css
           [ batch (buttonStyle model)
-          , borderRadius (px 18)
+          , borderRadius (px 17)
           ]
         ]
         [ text "Search" ]
@@ -324,23 +333,50 @@ successSearchResults model =
         ]
 
 
-viewSettingsContainer : Model -> Html Msg
-viewSettingsContainer model =
+footer : Model -> Html Msg
+footer model =
+  let colors = colorValues model.lighting in
   div
     [ css
-      [ position absolute
+      [ displayFlex
+      , flexDirection rowReverse
+      , position absolute
       , bottom zero
-      , right zero
-      , margin (px 20)
-      , textAlign right
+      , right (px 15)
+      , left (px 15)
+      , padding2 (px 15) zero
+      , backgroundColor colors.background
       ]
     ]
-    [ if model.showSettings then
-        viewSettings model
-      else
-        text ""
+    [ footerBorder model
     , viewSettingsToggle model
     ]
+
+
+footerBorder : Model -> Html Msg
+footerBorder model =
+  div
+    [ css
+      [ Css.height (px 1)
+      , position absolute
+      , right zero
+      , left zero
+      , top (px -1)
+      , borderTop3 (px 1) solid (hex "e6bc2f")
+      , transition
+          [ Css.Transitions.left3 300 0 linear
+          , Css.Transitions.right3 300 0 linear
+          ]
+      , if model.showSettings then
+          batch
+            [ left (calc (pct 100) minus (px 152))
+            , right (px 20)
+            ]
+        else
+          batch [ ]       
+      ]
+    ]
+    []
 
 
 viewSettingsToggle : Model -> Html Msg
@@ -349,8 +385,8 @@ viewSettingsToggle model =
     model
     "settings-toggle"
     "Settings"
-    [  ]
-    [  ]
+    [ ]
+    [ ]
     model.showSettings
     ToggleSettings
 
@@ -359,14 +395,7 @@ viewSettings : Model -> Html Msg
 viewSettings model =
   let colors = colorValues model.lighting in
   div
-    [ css
-      [ backgroundColor colors.menuBackground
-      , padding (px 10)
-      , marginBottom (px 10)
-      , Css.width (px 150)
-      , textAlign left
-      , batch (menuBorder model)
-      ]
+    [ css (shownSettings model)
     ]
     [ labeledCheckbox
         model
@@ -413,6 +442,24 @@ shield msg dim =
     , onClick msg
     ]
     []
+
+
+shownSettings : Model -> List Style
+shownSettings model =
+  [ padding (px 10)
+  , Css.width (px 150)
+  , textAlign left
+  , batch (menuBorder model)
+  , position absolute
+  , right (px 15)
+  , bottom (px 51)
+  , borderColor (hex "e6bc2f")
+  , transition [ Css.Transitions.transform3 400 0 easeInOut ]
+  , if model.showSettings then
+      batch [ transform (translateY zero) ]
+    else
+      batch [ transform (translateY (pct 100)) ]
+  ]
 
 
 labeledCheckbox : Model -> String -> String -> List Style -> List Style -> Bool -> (Bool -> Msg) -> Html Msg

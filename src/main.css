@@ -38,6 +38,8 @@ button:active {
 input {
   font-size: inherit;
   font: inherit;
+  color: inherit;
+  background: transparent;
 }
 
 input:focus {
