@@ -413,14 +413,10 @@ footerBorder model =
       , top (px -1)
       , borderTop3 (px 1) solid (hex "e6bc2f")
       , transition
-          [ Css.Transitions.left3 300 0 linear
-          , Css.Transitions.right3 300 0 linear
+          [ Css.Transitions.transform3 300 0 easeInOut
           ]
       , if model.showSettings then
-          batch
-            [ left (calc (pct 100) minus (px 152))
-            , right (px 20)
-            ]
+          batch [ transform (translateY (px 10)) ]
         else
           batch [ ]       
       ]
@@ -503,11 +499,14 @@ shownSettings model =
   , right (px 15)
   , bottom (px 51)
   , borderColor (hex "e6bc2f")
-  , transition [ Css.Transitions.transform3 400 0 easeInOut ]
+  , transition
+      [ Css.Transitions.transform3 400 0 easeInOut
+      , Css.Transitions.opacity3 300 100 linear
+      ]
   , if model.showSettings then
-      batch [ transform (translateY zero) ]
+      batch [ transform (translateY zero), opacity (Css.int 1) ]
     else
-      batch [ transform (translateY (pct 100)) ]
+      batch [ transform (translateY (pct 100)), opacity zero ]
   ]
 
 
