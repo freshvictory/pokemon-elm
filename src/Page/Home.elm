@@ -13,7 +13,7 @@ import Html.Styled.Attributes exposing (css, href, src, title)
 
 import HtmlHelper exposing (..)
 import Page
-import Theme exposing (colors)
+import Theme exposing (colors, images)
 import Type exposing (Type(..), getTypeInfo)
 
 
@@ -83,7 +83,7 @@ viewType t =
     typeInfo = getTypeInfo t
   in
     a
-      [ href ( "type/" ++ typeInfo.id )
+      [ href ( "/type/" ++ typeInfo.id )
       , title typeInfo.name
       , css
         [ aStyleReset
@@ -96,7 +96,7 @@ viewType t =
         ]
       ]
       [ img
-        [ src ( "images/type-" ++ typeInfo.id ++ ".png" )
+        [ src (images.typeIcon t)
         , css
           [ height (px 40)
           , width (px 40)

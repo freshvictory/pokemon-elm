@@ -1,4 +1,4 @@
-module Type exposing (Type(..), TypeInfo, getTypeInfo, fromString)
+module Type exposing (Type(..), TypeInfo, TypeRelationships, getTypeInfo, fromString)
 
 
 type Type

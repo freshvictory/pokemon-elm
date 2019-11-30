@@ -13,11 +13,15 @@ import Html.Styled exposing
   , map
   , header
   , main_
+  , a
   , div
   , nav
   , img
   )
-import Html.Styled.Attributes exposing (css, src)
+import Html.Styled.Attributes exposing (css, src, href)
+
+
+import Theme exposing (images)
 
 
 
@@ -65,10 +69,14 @@ viewHeader =
         , marginBottom (px 25)
         ]
       ]
-      [ img
-        [ src "images/logo-pokemon.png"
-        , css [ display block, margin2 zero auto ]
-        ] []
+      [ a
+        [ href "/" 
+        ]
+        [ img
+          [ src images.logo
+          , css [ display block, margin2 zero auto ]
+          ] []
+        ]
       ]
     ]
 
