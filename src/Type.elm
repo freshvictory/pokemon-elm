@@ -1,4 +1,4 @@
-module Type exposing (Type, getTypeInfo)
+module Type exposing (Type(..), TypeInfo, getTypeInfo, fromString)
 
 
 type Type
@@ -35,6 +35,30 @@ type alias TypeRelationships =
   , resistantTo: List Type
   , counters: List Type
   }
+
+
+fromString : String -> Maybe Type
+fromString s =
+  case s of
+    "normal" -> Just Normal
+    "fighting" -> Just Fighting
+    "flying" -> Just Flying
+    "poison" -> Just Poison
+    "ground" -> Just Ground
+    "rock" -> Just Rock
+    "bug" -> Just Bug
+    "ghost" -> Just Ghost
+    "steel" -> Just Steel
+    "fire" -> Just Fire
+    "water" -> Just Water
+    "grass" -> Just Grass
+    "electric" -> Just Electric
+    "psychic" -> Just Psychic
+    "ice" -> Just Ice
+    "dragon" -> Just Dragon
+    "fairy" -> Just Fairy
+    "dark" -> Just Dark
+    _ -> Nothing
 
 
 getTypeInfo : Type -> TypeInfo
