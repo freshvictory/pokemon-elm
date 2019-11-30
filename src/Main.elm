@@ -47,9 +47,6 @@ updateWithStorage msg model =
 
 type alias Model =
   { lighting: Lighting
-  , query: String
-  , searchStatus: SearchStatus
-  , searchResults: Maybe TypeResult
   , showSettings: Bool
   }
 
@@ -71,33 +68,6 @@ type alias Colors =
   }
 
 
-type SearchStatus
-  = Loading
-  | Failure
-  | Success
-
-
-type alias TypeResult =
-  { typeInfo: TypeInfo
-  , relationships: TypeRelationships
-  }
-
-
-type alias TypeInfo =
-  { id: String
-  , name: String    
-  }
-
-
-type alias TypeRelationships =
-  { effectiveAgainst: List TypeInfo
-  , weakAgainst: List TypeInfo
-  , ineffectiveAgainst: List TypeInfo
-  , resistantTo: List TypeInfo
-  , counters: List TypeInfo
-  }
-
-
 init : Json.Decode.Value -> ( Model, Cmd Msg )
 init state =
   let
@@ -112,9 +82,6 @@ init state =
 defaultModel : Lighting -> Model
 defaultModel lighting =
   { lighting = lighting
-  , query = ""
-  , searchStatus = Success
-  , searchResults = Nothing
   , showSettings = False
   }
 
@@ -172,10 +139,7 @@ lightColors =
 
 
 type Msg
-  = UpdateQuery String
-  | Search
-  | SearchResult (Result Http.Error TypeApiResult)
-  | ChangeLighting Bool
+  = ChangeLighting Bool
   | Update
   | ToggleSettings Bool
 
@@ -183,23 +147,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    UpdateQuery query ->
-      ( { model | query = query }, Cmd.none )
-    Search ->
-      ( { model | searchStatus = Loading }
-      , searchType model.query
-      )
-    SearchResult result ->
-      case result of
-        Ok typeResult ->
-          ( { model
-            | searchStatus = Success
-            , searchResults = Just (mapApiResult typeResult)
-            }
-          , Cmd.none
-          )
-        Err _ ->
-          ( { model | searchStatus = Failure }, Cmd.none )
     ChangeLighting checked ->
       ( { model | lighting = if checked then Light else Dark }, Cmd.none )
     Update ->
@@ -226,7 +173,6 @@ view model =
         ]
       ]
       [ header
-      , searchView model
       , if model.showSettings then
           shield (ToggleSettings False) False
         else
@@ -251,134 +197,6 @@ header =
       [ src "logo-pokemon.png"
       , css [ display block, margin2 zero auto ]
       ] []
-    ]
-
-
-searchView : Model -> Html Msg
-searchView model =
-  div []
-    [ searchBox model
-    , searchResults model
-    ]
-
-
-searchBox : Model -> Html Msg
-searchBox model =
-  let
-    colors = colorValues model.lighting
-  in
-    Html.Styled.form
-      [ css
-        [ Css.width (pct 100)
-        , color colors.text
-        , displayFlex
-        , batch (menuBorder model)
-        , padding (px 3)
-        , boxSizing borderBox
-        ]
-      , onSubmit Search
-      ]
-      [ input
-          [ css
-            [ Css.width (pct 100)
-            , paddingLeft (px 8)
-            , border zero
-            ]
-          , placeholder "Search for a Pokemon type"
-          , Html.Styled.Attributes.value model.query
-          , onInput UpdateQuery
-          , Html.Styled.Attributes.required True
-          ]
-          []
-      , button
-        [ type_ "submit"
-        , css
-          [ batch (buttonStyle model)
-          , borderRadius (px 17)
-          ]
-        ]
-        [ text "Search" ]
-      ]
-
-
-searchResults : Model -> Html Msg
-searchResults model =
-  case model.searchStatus of
-    Loading -> loadingSearchResults model
-    Failure -> failureSearchResults
-    Success -> successSearchResults model
-
-
-loadingSearchResults : Model -> Html Msg
-loadingSearchResults model =
-  div [] [ text ("Loading " ++ model.query) ]
-
-
-failureSearchResults : Html Msg
-failureSearchResults =
-  div [] [ text "Could not load results. Please try again later." ]
-
-
-successSearchResults : Model -> Html Msg
-successSearchResults model =
-  case model.searchResults of
-    Nothing ->
-      text ""
-    Just results ->
-      div
-        [ css [ marginTop (px 20) ] ]
-        [ resultsTable results.relationships
-        ]
-
-
-resultsTable : TypeRelationships -> Html Msg
-resultsTable relationships =
-  Html.Styled.table
-    [ css
-      [ borderCollapse collapse
-      , tableLayout fixed
-      , color (hex "111")
-      ]
-    ]
-    [ tr [ css [ backgroundColor (hex "69c423") ] ]
-      [ td [ css tableDataStyle ] [ text "Effective against" ]
-      , displayResults relationships.effectiveAgainst
-      ]
-    , tr [ css [ backgroundColor (hex "f9ed63") ] ]
-      [ td [ css tableDataStyle ] [ text "Weak against" ]
-      , displayResults relationships.weakAgainst
-      ]
-    , tr [ css [ backgroundColor (hex "f78360") ] ]
-      [ td [ css tableDataStyle ] [ text "Ineffective against" ]
-      , displayResults relationships.ineffectiveAgainst
-      ]
-    , tr [ css [ backgroundColor (hex "20c0f9") ] ]
-      [ td [ css tableDataStyle ] [ text "Resistant to" ]
-      , displayResults relationships.resistantTo
-      ]
-    , tr [ css [ backgroundColor (hex "ffa500") ] ]
-      [ td [ css tableDataStyle ] [ text "Counters" ]
-      , displayResults relationships.counters
-      ]
-    ]
-
-
-tableDataStyle : List Style
-tableDataStyle =
-  [ padding (px 20)
-  , textAlign center
-  ]
-
-
-displayResults : List TypeInfo -> Html Msg
-displayResults types =
-  td [ css tableDataStyle ]
-    [ text (
-      if List.isEmpty types then
-        "--"
-      else
-        String.join ", " (List.map (\t -> t.name) types)
-      )
     ]
 
 
@@ -546,82 +364,5 @@ buttonStyle model =
   , padding2 (px 6) (px 20)
   , borderRadius (px 10)
   ]
-
-
-
--- HTTP
-
-
-type alias TypeApiResult =
-  { id: String
-  , name: String
-  , relationships: TypeRelationship
-  }
-
-
-type alias TypeRelationship =
-  { resistantTo: List TypeApiShorthand
-  , counters: List TypeApiShorthand
-  , effectiveAgainst: List TypeApiShorthand
-  , weakAgainst: List TypeApiShorthand
-  , ineffectiveAgainst: List TypeApiShorthand
-  }
-
-
-type alias TypeApiShorthand =
-  { id: String
-  , name: String
-  }
-
-
-mapApiResult : TypeApiResult -> TypeResult
-mapApiResult apiResult =
-  { typeInfo = { id = apiResult.id, name = apiResult.name }
-  , relationships =
-    { effectiveAgainst = apiResult.relationships.effectiveAgainst
-    , weakAgainst = apiResult.relationships.weakAgainst
-    , ineffectiveAgainst = apiResult.relationships.ineffectiveAgainst
-    , resistantTo = apiResult.relationships.resistantTo
-    , counters = apiResult.relationships.counters
-    }
-  }
-
-
-normalizeQuery : String -> String
-normalizeQuery q =
-  String.toLower (String.trim q)
-
-
-searchType : String -> Cmd Msg
-searchType t =
-  Http.get
-    { url = "https://pokemon-type-api.herokuapp.com/type/" ++ normalizeQuery t
-    , expect = Http.expectJson SearchResult typeDecoder
-    }
-
-
-typeDecoder : Decoder TypeApiResult
-typeDecoder =
-  Json.Decode.map3 TypeApiResult
-    (field "type" string)
-    (field "name" string)
-    (field "relationships" typeRelationshipDecoder)
-
-
-typeRelationshipDecoder : Decoder TypeRelationship
-typeRelationshipDecoder =
-  Json.Decode.map5 TypeRelationship
-    (field "resistantTo" (Json.Decode.list typeShorthandDecoder))
-    (field "counters" (Json.Decode.list typeShorthandDecoder))
-    (field "effectiveAgainst" (Json.Decode.list typeShorthandDecoder))
-    (field "weakAgainst" (Json.Decode.list typeShorthandDecoder))
-    (field "ineffectiveAgainst" (Json.Decode.list typeShorthandDecoder))
-
-
-typeShorthandDecoder : Decoder TypeApiShorthand
-typeShorthandDecoder =
-  Json.Decode.map2 TypeApiShorthand
-    (field "type" string)
-    (field "name" string)
 
 
