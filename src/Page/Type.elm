@@ -7,9 +7,10 @@ import Html.Styled exposing
   , div
   , h1
   , h2
+  , a
   , text
   )
-import Html.Styled.Attributes exposing (css)
+import Html.Styled.Attributes exposing (css, href)
 import Html.Styled.Events exposing (onClick)
 
 
@@ -81,7 +82,16 @@ viewTypeHeader t =
       , padding (px 10)
       ]
     ]
-    [ viewTypeLink t
+    [ a
+      [ href "/"
+      , css
+        [ aStyleReset
+        , fontWeight bold
+        , padding (px 5)
+        ]
+      ]
+      [ text "<"]
+    , viewTypeLink t
     , h1
       [ css
         [ paddingLeft (px 5)
