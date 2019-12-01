@@ -57,7 +57,10 @@ view model =
 viewHeader : Html msg
 viewHeader =
   header
-    []
+    [ css
+      [ property "margin-top" "env(safe-area-inset-top)"
+      ]
+    ]
     [ nav
       [ css
         [ borderBottom3 (px 1) solid (hex "e6bc2f")

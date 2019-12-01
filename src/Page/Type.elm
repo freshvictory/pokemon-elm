@@ -80,6 +80,7 @@ viewTypeHeader t =
       , alignItems center
       , backgroundColor (colors.typeBackground t.primary)
       , padding (px 10)
+      , property "margin-top" "env(safe-area-inset-top)"
       ]
     ]
     [ a
