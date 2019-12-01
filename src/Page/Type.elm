@@ -69,7 +69,7 @@ viewType model =
     ]
     [ div
       [ css
-        [ property "margin-top" "env(safe-area-inset-top)"
+        [ property "padding-top" "env(safe-area-inset-top)"
         , backgroundColor (colors.typeBackground model.t.primary)
         , borderBottom3 (px 1) solid (colors.typeBackground model.t.primary)
         ]
