@@ -1,25 +1,7 @@
-module Theme exposing (colors, images)
+module Theme exposing (colors)
 
 import Css exposing (Color, hex)
 import Type exposing (Type, SubType(..))
-
-
-type alias Images =
-  { logo: String
-  , typeIcon: Type -> String
-  }
-
-
-images : Images
-images =
-  { logo = "/images/logo-pokemon.png"
-  , typeIcon = iconForType
-  }
-
-
-iconForType : Type -> String
-iconForType typeInfo =
-  "/images/type-" ++ typeInfo.id ++ ".png"
 
 
 type alias Colors =

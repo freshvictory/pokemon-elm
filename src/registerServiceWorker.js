@@ -39,25 +39,7 @@ export default function register() {
     const PRECACHE_URLS = [
       '/',
       '/index.html',
-      '/images/logo-pokemon.png',
-      '/images/type-bug.png',
-      '/images/type-dark.png',
-      '/images/type-dragon.png',
-      '/images/type-electric.png',
-      '/images/type-fairy.png',
-      '/images/type-fighting.png',
-      '/images/type-fire.png',
-      '/images/type-flying.png',
-      '/images/type-ghost.png',
-      '/images/type-grass.png',
-      '/images/type-ground.png',
-      '/images/type-ice.png',
-      '/images/type-normal.png',
-      '/images/type-poison.png',
-      '/images/type-psychic.png',
-      '/images/type-rock.png',
-      '/images/type-steel.png',
-      '/images/type-water.png'
+      '/src/main.css'
     ];
 
     // The install handler takes care of precaching the resources we always need.
@@ -87,9 +69,8 @@ export default function register() {
     // If no response is found, it populates the runtime cache with the response
     // from the network before returning it to the page.
     self.addEventListener('fetch', event => {
-      console.log('Fetching +' + event.request.url)
       // Skip cross-origin requests, like those for Google Analytics.
-      if (event.request.url.startsWith(self.location.origin + '/images')) {
+      if (event.request.url.startsWith(self.location.origin)) {
         event.respondWith( () => {
           caches.match(event.request).then(cachedResponse => {
             if (cachedResponse) {

@@ -2,12 +2,12 @@ module HtmlHelper exposing (..)
 
 
 import Css exposing (..)
-import Html.Styled exposing (Html, a, img)
-import Html.Styled.Attributes exposing (css, src, href, title)
+import Html.Styled exposing (Html, a, div)
+import Html.Styled.Attributes exposing (css, class, src, href, title)
 
 
 import Type exposing (Type)
-import Theme exposing (colors, images)
+import Theme exposing (colors)
 
 
 listStyleReset : Style
@@ -69,12 +69,13 @@ viewTypeLink t =
       , justifyContent center
       ]
     ]
-    [ img
-      [ src (images.typeIcon t)
-      , css
+    [ div
+      [ css
         [ height (px 40)
         , width (px 40)
+        , backgroundSize (px 40)
         ]
+      , class ("type-" ++ t.id)
       ]
       []
     ]

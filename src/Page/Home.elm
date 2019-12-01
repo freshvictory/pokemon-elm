@@ -13,11 +13,11 @@ import Html.Styled exposing
   , img
   , a
   )
-import Html.Styled.Attributes exposing (css, href, src, title)
+import Html.Styled.Attributes exposing (css, href, src, class)
 
 import HtmlHelper exposing (..)
 import Page
-import Theme exposing (colors, images)
+import Theme exposing (colors)
 import Type exposing (..)
 
 
@@ -72,9 +72,14 @@ viewHeader =
       [ a
         [ href "/" 
         ]
-        [ img
-          [ src images.logo
-          , css [ display block, margin2 zero auto ]
+        [ div
+          [ class "logo-pokemon"
+          , css
+            [ display block
+            , margin2 zero auto
+            , width (px 79)
+            , height (px 45)
+            ]
           ] []
         ]
       ]
