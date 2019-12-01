@@ -145,8 +145,10 @@ routeToUrl url model =
       oneOf
         [ route top
             ( routeHome model Home.init )
+        , route ( s "index.html" )
+            ( routeHome model Home.init )
         , route ( s "type" </> typeParser )
-            (\t -> routeType model (Type.init t) )
+            ( \t -> routeType model (Type.init t) )
         ]    
   in
   case Parser.parse parser url of
