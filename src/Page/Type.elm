@@ -93,7 +93,7 @@ viewTypeHeader t =
         ]
       ]
       [ text "<"]
-    , viewTypeLink t
+    , Keyed.node "div" [] [ (t.id, viewTypeLink t) ]
     , h1
       [ css
         [ paddingLeft (px 5)
