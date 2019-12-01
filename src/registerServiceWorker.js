@@ -37,6 +37,8 @@ export default function register() {
 
     // A list of local resources we always want to be cached.
     const PRECACHE_URLS = [
+      '/',
+      '/index.html',
       '/images/logo-pokemon.png',
       '/images/type-bug.png',
       '/images/type-dark.png',
@@ -87,15 +89,26 @@ export default function register() {
     self.addEventListener('fetch', event => {
       // Skip cross-origin requests, like those for Google Analytics.
       if (event.request.url.startsWith(self.location.origin)) {
-        event.respondWith(
+        event.respondWith( () => {
+          if (/_redirects/.match(event.request)) {
+            return fetch(event.request);
+          }
+
           caches.match(event.request).then(cachedResponse => {
             if (cachedResponse) {
               return cachedResponse;
             }
 
-            return fetch(event.request);
+            return caches.open(RUNTIME).then(cache => {
+              return fetch(event.request).then(response => {
+                // Put a copy of the response in the runtime cache.
+                return cache.put(event.request, response.clone()).then(() => {
+                  return response;
+                });
+              });
+            });
           })
-        );
+        });
       }
     });
     
