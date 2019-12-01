@@ -12,6 +12,7 @@ import Html.Styled exposing
   )
 import Html.Styled.Attributes exposing (css, href)
 import Html.Styled.Events exposing (onClick)
+import Html.Styled.Keyed as Keyed
 
 
 import HtmlHelper exposing (..)
@@ -199,7 +200,7 @@ viewBattlingAgainst t =
     ]
 
 
-viewTypeRelationship :String -> Color -> Color -> List SubType -> Html Msg
+viewTypeRelationship : String -> Color -> Color -> List SubType -> Html Msg
 viewTypeRelationship headerText colorDark colorLight types =
   case types of
     [] ->
@@ -246,12 +247,13 @@ viewTypeRelationship headerText colorDark colorLight types =
 
 viewTypeGridItem : Type -> Html Msg
 viewTypeGridItem t =
-  div
+  Keyed.node
+    "div"
     [ css
       [ displayGrid
       , alignItems center
       , justifyContent center
       ]
     ]
-    [ viewTypeLink t
+    [ (t.id, viewTypeLink t)
     ]
