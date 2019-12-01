@@ -88,7 +88,7 @@ export default function register() {
     // from the network before returning it to the page.
     self.addEventListener('fetch', event => {
       // Skip cross-origin requests, like those for Google Analytics.
-      if (event.request.url.startsWith(self.location.origin)) {
+      if (event.request.url.startsWith(self.location.origin + '/images')) {
         event.respondWith( () => {
           caches.match(event.request).then(cachedResponse => {
             if (cachedResponse) {
