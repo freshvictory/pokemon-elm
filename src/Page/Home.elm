@@ -73,35 +73,6 @@ viewTypeGridItem t =
       , justifyContent center
       ]
     ]
-    [ viewType t
+    [ viewTypeLink t
     ]
-
-
-viewType : Type -> Html Msg
-viewType t =
-  let
-    typeInfo = getTypeInfo t
-  in
-    a
-      [ href ( "/type/" ++ typeInfo.id )
-      , title typeInfo.name
-      , css
-        [ aStyleReset
-        , padding (px 10)
-        , boxSizing borderBox
-        , backgroundColor (colors.typeBackground t)
-        , borderRadius (pct 50)
-        , width (px 60)
-        , height (px 60)
-        ]
-      ]
-      [ img
-        [ src (images.typeIcon t)
-        , css
-          [ height (px 40)
-          , width (px 40)
-          ]
-        ]
-        []
-      ]
 

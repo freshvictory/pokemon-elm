@@ -6,13 +6,13 @@ import Html.Styled exposing
   ( Html
   , div
   , h1
+  , h2
   , text
-  , tr
-  , td
   )
 import Html.Styled.Attributes exposing (css)
 
 
+import HtmlHelper exposing (..)
 import Page
 import Type exposing (Type, TypeInfo, TypeRelationships, getTypeInfo)
 
@@ -76,53 +76,26 @@ viewTypeRelationships : TypeInfo -> Html Msg
 viewTypeRelationships info =
   div
     []
-    [ resultsTable info.relationships
+    [ viewTypeRelationship "Strong against" info.relationships.effectiveAgainst
+    , viewTypeRelationship "Weak against" info.relationships.weakAgainst
+    , viewTypeRelationship "No effect on" info.relationships.ineffectiveAgainst
+    , viewTypeRelationship "Resistant to" info.relationships.resistantTo
+    , viewTypeRelationship "Counters" info.relationships.counters
     ]
 
 
-
-resultsTable : TypeRelationships -> Html Msg
-resultsTable relationships =
-  Html.Styled.table
-    [ css
-      [ borderCollapse collapse
-      , tableLayout fixed
-      , color (hex "111")
+viewTypeRelationship : String -> List Type -> Html Msg
+viewTypeRelationship header types =
+  div
+    []
+    [ h2
+      []
+      [ text header
       ]
-    ]
-    [ tr [ css [ backgroundColor (hex "69c423") ] ]
-      [ td [ css tableDataStyle ] [ text "Effective against" ]
-      , displayResults relationships.effectiveAgainst
+    , div
+      [ css
+        [
+        ]
       ]
-    , tr [ css [ backgroundColor (hex "f9ed63") ] ]
-      [ td [ css tableDataStyle ] [ text "Weak against" ]
-      , displayResults relationships.weakAgainst
-      ]
-    , tr [ css [ backgroundColor (hex "20c0f9") ] ]
-      [ td [ css tableDataStyle ] [ text "Resistant to" ]
-      , displayResults relationships.resistantTo
-      ]
-    , tr [ css [ backgroundColor (hex "ffa500") ] ]
-      [ td [ css tableDataStyle ] [ text "Counters" ]
-      , displayResults relationships.counters
-      ]
-    ]
-
-
-tableDataStyle : List Style
-tableDataStyle =
-  [ padding (px 20)
-  , textAlign center
-  ]
-
-
-displayResults : List Type -> Html Msg
-displayResults types =
-  td [ css tableDataStyle ]
-    [ text (
-      if List.isEmpty types then
-        "--"
-      else
-        String.join ", " (List.map (\t -> (getTypeInfo t).name) types)
-      )
+      ( List.map viewTypeLink types )
     ]
