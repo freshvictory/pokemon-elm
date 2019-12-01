@@ -1,7 +1,7 @@
 module Theme exposing (colors, images)
 
 import Css exposing (Color, hex)
-import Type exposing (Type(..), getTypeInfo)
+import Type exposing (Type, SubType(..))
 
 
 type alias Images =
@@ -18,11 +18,8 @@ images =
 
 
 iconForType : Type -> String
-iconForType t =
-  let
-    typeInfo = getTypeInfo t  
-  in
-    "/images/type-" ++ typeInfo.id ++ ".png"
+iconForType typeInfo =
+  "/images/type-" ++ typeInfo.id ++ ".png"
 
 
 type alias Colors =
@@ -31,8 +28,8 @@ type alias Colors =
   , text : Color
   , border : Color
   , buttonBackground : Color
-  , typeForeground : Type -> Color
-  , typeBackground : Type -> Color
+  , typeForeground : SubType -> Color
+  , typeBackground : SubType -> Color
   }
 
 
@@ -48,17 +45,17 @@ colors =
   }
 
 
-getTypeForegroundColor : Type -> Color
+getTypeForegroundColor : SubType -> Color
 getTypeForegroundColor t =
   hex (getTypeColor t)
 
 
-getTypeBackgroundColor : Type -> Color
+getTypeBackgroundColor : SubType -> Color
 getTypeBackgroundColor t =
   hex (getTypeColor t ++ "55")
 
 
-getTypeColor : Type -> String
+getTypeColor : SubType -> String
 getTypeColor t =
   case t of
     Normal ->

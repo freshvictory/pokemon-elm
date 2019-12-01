@@ -14,7 +14,7 @@ import Html.Styled.Attributes exposing (css)
 
 import HtmlHelper exposing (..)
 import Page
-import Type exposing (Type, TypeInfo, TypeRelationships, getTypeInfo)
+import Type exposing (Type, SubType, TypeRelationships, fromSubType)
 
 
 type Msg
@@ -23,14 +23,12 @@ type Msg
 
 type alias Model =
   { t : Type
-  , typeInfo : TypeInfo
   }
 
 
 init : Type -> ( Model, Cmd Msg )
 init t =
   ( { t = t
-    , typeInfo = getTypeInfo t
     }
   , Cmd.none
   )
@@ -44,7 +42,7 @@ update msg model =
 
 view : Model -> Page.Details Msg
 view model =
-  { title = model.typeInfo.name
+  { title = model.t.name
   , attrs = []
   , body =
     [ viewType model
@@ -59,32 +57,34 @@ viewType model =
       [ margin (px 20)
       ]
     ]
-    [ viewTypeHeader model.typeInfo
-    , viewTypeRelationships model.typeInfo
+    [ viewTypeHeader model.t
+    , viewTypeRelationships model.t
     ]
 
 
-viewTypeHeader : TypeInfo -> Html Msg
-viewTypeHeader info =
+viewTypeHeader : Type -> Html Msg
+viewTypeHeader t =
   h1
-    []
-    [ text info.name
+    [ css
+      []
+    ]
+    [ text t.name
     ]
 
 
-viewTypeRelationships : TypeInfo -> Html Msg
-viewTypeRelationships info =
+viewTypeRelationships : Type -> Html Msg
+viewTypeRelationships t =
   div
     []
-    [ viewTypeRelationship "Strong against" info.relationships.effectiveAgainst
-    , viewTypeRelationship "Weak against" info.relationships.weakAgainst
-    , viewTypeRelationship "No effect on" info.relationships.ineffectiveAgainst
-    , viewTypeRelationship "Resistant to" info.relationships.resistantTo
-    , viewTypeRelationship "Counters" info.relationships.counters
+    [ viewTypeRelationship "Strong against" t.relationships.effectiveAgainst
+    , viewTypeRelationship "Weak against" t.relationships.weakAgainst
+    , viewTypeRelationship "No effect on" t.relationships.ineffectiveAgainst
+    , viewTypeRelationship "Resistant to" t.relationships.resistantTo
+    , viewTypeRelationship "Counters" t.relationships.counters
     ]
 
 
-viewTypeRelationship : String -> List Type -> Html Msg
+viewTypeRelationship : String -> List SubType -> Html Msg
 viewTypeRelationship header types =
   div
     []
@@ -97,5 +97,5 @@ viewTypeRelationship header types =
         [
         ]
       ]
-      ( List.map viewTypeLink types )
+      ( List.map (fromSubType >> viewTypeLink) types )
     ]

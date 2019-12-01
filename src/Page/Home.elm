@@ -14,7 +14,7 @@ import Html.Styled.Attributes exposing (css, href, src, title)
 import HtmlHelper exposing (..)
 import Page
 import Theme exposing (colors, images)
-import Type exposing (Type(..), getTypeInfo)
+import Type exposing (..)
 
 
 
@@ -61,7 +61,7 @@ viewTypeList model =
     ]
     ( List.map
       viewTypeGridItem
-      [ Normal, Fighting, Flying, Poison, Ground, Rock, Bug, Ghost, Steel, Fire, Water, Grass, Electric, Psychic, Ice, Dragon, Fairy, Dark ] )
+      [ Type.normal, fighting, flying, poison, ground, rock, bug, ghost, steel, fire, water, grass, electric, psychic, ice, dragon, fairy, dark ] )
 
 
 viewTypeGridItem : Type -> Html Msg
