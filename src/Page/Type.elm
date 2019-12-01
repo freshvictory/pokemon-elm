@@ -85,7 +85,8 @@ viewTypeHeader t =
     ]
     [ div
       [ css
-        [ property "height" "env(safe-area-inset-top)"
+        [ property "margin-top" "env(safe-area-inset-top)"
+        , borderBottom3 (px 1) solid (colors.typeBackground t.primary)
         ]
       ]
       []
@@ -95,6 +96,7 @@ viewTypeHeader t =
         [ aStyleReset
         , fontWeight bold
         , padding (px 5)
+        , fontSize (px 24)
         ]
       ]
       [ text "<"]
