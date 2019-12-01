@@ -90,7 +90,7 @@ export default function register() {
       // Skip cross-origin requests, like those for Google Analytics.
       if (event.request.url.startsWith(self.location.origin)) {
         event.respondWith( () => {
-          if (/_redirects/.match(event.request)) {
+          if (/_redirects/.test(event.request)) {
             return fetch(event.request);
           }
 
