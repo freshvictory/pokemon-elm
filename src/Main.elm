@@ -1,8 +1,10 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
+import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Html.Styled exposing (text)
+import Task
 import Url
 import Url.Parser as Parser exposing
   ( Parser
@@ -36,6 +38,9 @@ main =
     }
 
 
+port blurActiveElement : () -> Cmd msg
+
+
 ---- MODEL ----
 
 
@@ -66,6 +71,7 @@ type Msg
   | UrlChanged Url.Url
   | HomeMsg Home.Msg
   | TypeMsg Type.Msg
+  | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,16 +79,27 @@ update msg model =
   case ( msg, model.page ) of
     ( Update, _ ) ->
       ( model, Nav.reloadAndSkipCache )
-    (LinkClicked urlRequest, _) ->
+    ( LinkClicked urlRequest, _ ) ->
       case urlRequest of
         Browser.Internal url ->
-          ( model, Nav.pushUrl model.key (Url.toString url) )
+          ( model
+          , Cmd.batch
+            [ blurActiveElement ()
+            , Nav.pushUrl model.key (Url.toString url)
+            ]
+          )
         
         Browser.External href ->
           ( model, Nav.load href )
     
-    (UrlChanged url, _) ->
+    ( UrlChanged url, _ ) ->
       routeToUrl url model
+
+    ( HomeMsg m, Home h ) ->
+      routeHome model (Home.update m h)
+
+    ( TypeMsg m, Type t ) ->
+      routeType model (Type.update m t)
 
     _ ->
       ( model, Cmd.none )

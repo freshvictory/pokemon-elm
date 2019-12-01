@@ -11,17 +11,10 @@ import Html.Styled exposing
   , Attribute
   , toUnstyled
   , map
-  , header
   , main_
-  , a
   , div
-  , nav
-  , img
   )
-import Html.Styled.Attributes exposing (css, src, href)
-
-
-import Theme exposing (images)
+import Html.Styled.Attributes exposing (id)
 
 
 
@@ -49,33 +42,9 @@ view toMsg details =
 viewApp : (a -> msg) -> List (Attribute a) -> List (Html a) -> Html msg
 viewApp toMsg attrs body =
   div
-    []
-    [ map toMsg (viewBody attrs body)
+    [ id "top"
     ]
-
-
-
-viewHeader : Html msg
-viewHeader =
-  header
-    []
-    [ nav
-      [ css
-        [ borderBottom3 (px 1) solid (hex "e6bc2f")
-        , paddingTop (px 22)
-        , paddingBottom (px 20)
-        , margin zero
-        ]
-      ]
-      [ a
-        [ href "/" 
-        ]
-        [ img
-          [ src images.logo
-          , css [ display block, margin2 zero auto ]
-          ] []
-        ]
-      ]
+    [ map toMsg (viewBody attrs body)
     ]
 
 

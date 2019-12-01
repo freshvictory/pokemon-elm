@@ -4,6 +4,10 @@ import Css exposing (..)
 import Html.Styled exposing
   ( Html
   , text
+  , header
+  , nav
+  , h1
+  , div
   , ul
   , li
   , img
@@ -43,20 +47,69 @@ view model =
   { title = "Home"
   , attrs = []
   , body =
-    [ viewTypeList model
+    [ viewHeader
+    , viewContent
     ]
   }
 
 
-viewTypeList : Model -> Html Msg
-viewTypeList model =
+
+viewHeader : Html msg
+viewHeader =
+  header
+    []
+    [ nav
+      [ css
+        [ borderBottom3 (px 1) solid (hex "e6bc2f")
+        , paddingTop (px 22)
+        , paddingBottom (px 20)
+        , margin zero
+        ]
+      ]
+      [ a
+        [ href "/" 
+        ]
+        [ img
+          [ src images.logo
+          , css [ display block, margin2 zero auto ]
+          ] []
+        ]
+      ]
+    ]
+
+
+viewContent : Html Msg
+viewContent =
+  div
+    [ css
+      [ padding (px 20)
+      ]
+    ]
+    [ viewContentHeader
+    , viewTypeList
+    ]
+
+
+viewContentHeader : Html Msg
+viewContentHeader =
+  h1
+    [ css
+      [ margin4 zero zero (px 20) zero
+      , fontSize (px 20)
+      , textAlign center
+      ]
+    ]
+    [ text "Choose a Pokemon type!" ]
+
+
+viewTypeList : Html Msg
+viewTypeList =
   ul
     [ css
       [ listStyleReset
       , displayGrid
       , gridGap 20
       , property "grid-template-columns" "repeat(auto-fit, minmax(60px, 1fr))"
-      , margin (px 20)
       ]
     ]
     ( List.map

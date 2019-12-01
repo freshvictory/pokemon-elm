@@ -10,6 +10,7 @@ import Html.Styled exposing
   , text
   )
 import Html.Styled.Attributes exposing (css)
+import Html.Styled.Events exposing (onClick)
 
 
 import HtmlHelper exposing (..)
@@ -19,7 +20,7 @@ import Type exposing (Type, SubType, TypeRelationships, fromSubType)
 
 
 type Msg
-  = NoOp
+  = SwitchView Viewing
 
 
 type Viewing
@@ -45,7 +46,8 @@ init t =
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
   case msg of
-    NoOp -> ( model, Cmd.none )
+    SwitchView v ->
+      ( { model | viewing = v }, Cmd.none )
 
 
 view : Model -> Page.Details Msg
@@ -64,6 +66,7 @@ viewType model =
     [
     ]
     [ viewTypeHeader model.t
+    , viewTabsContainer model
     , viewTypeRelationships model
     ]
 
@@ -81,11 +84,73 @@ viewTypeHeader t =
     [ viewTypeLink t
     , h1
       [ css
-        [ paddingLeft (px 10)
+        [ paddingLeft (px 5)
         , margin zero
         ]
       ]
       [ text t.name ]
+    ]
+
+
+viewTabsContainer : Model -> Html Msg
+viewTabsContainer model =
+  div
+    [ css
+      [ margin2 (px 30) auto
+      , display block
+      , width (pct 80)
+      , borderBottom3 (px 1) solid colors.border
+      , position relative
+      ]
+    ]
+    [ viewTabs model
+    ]
+
+
+viewTabs : Model -> Html Msg
+viewTabs model =
+  div
+    [ css
+      [ displayFlex
+      , position absolute
+      , top (px -15)
+      , left (pct 50)
+      , transform (translateX (pct -50))
+      ]
+    ]
+    [ viewTab "Against" Against True model
+    , viewTab "With" With False model
+    ]
+
+
+viewTab : String -> Viewing -> Bool -> Model -> Html Msg
+viewTab name viewing left model =
+  div
+    [ onClick (SwitchView viewing)
+    , css
+      [ cursor pointer
+      , padding2 (px 5) (px 10)
+      , border3 (px 1) solid colors.border
+      , Css.batch
+        ( if model.viewing == viewing then
+            [ backgroundColor colors.menuBackground ]
+          else
+            [ backgroundColor colors.background ]
+        )
+      , Css.batch
+        ( if left then
+            [ borderTopLeftRadius (px 10)
+            , borderBottomLeftRadius (px 10)
+            , borderRight zero
+            ]
+          else
+            [ borderTopRightRadius (px 10)
+            , borderBottomRightRadius (px 10)
+            ]
+        )
+      ]
+    ]
+    [ text name
     ]
 
 
@@ -155,7 +220,7 @@ viewTypeRelationship headerText colorDark colorLight types =
           [ css
             [ displayGrid
             , gridGap 15
-            , property "grid-template-columns" "repeat(auto-fit, minmax(60px, 1fr))"
+            , property "grid-template-columns" "repeat(auto-fill, minmax(60px, 1fr))"
             , padding (px 15)
             , borderBottomLeftRadius inherit
             , borderBottomRightRadius inherit
