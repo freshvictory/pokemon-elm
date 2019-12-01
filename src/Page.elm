@@ -14,7 +14,7 @@ import Html.Styled exposing
   , main_
   , div
   )
-import Html.Styled.Attributes exposing (id)
+import Html.Styled.Attributes exposing (css, id)
 
 
 
@@ -43,6 +43,15 @@ viewApp : (a -> msg) -> List (Attribute a) -> List (Html a) -> Html msg
 viewApp toMsg attrs body =
   div
     [ id "top"
+    , css
+      [ width (pct 100)
+      , height (pct 100)
+      , position fixed
+      , property "user-select" "none"
+      , property "-moz-user-select" "none"
+      , property "-webkit-user-select" "none"
+      , property "-ms-user-select" "none"
+      ]
     ]
     [ map toMsg (viewBody attrs body)
     ]

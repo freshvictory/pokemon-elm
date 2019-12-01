@@ -67,7 +67,15 @@ viewType model =
   div
     [
     ]
-    [ viewTypeHeader model.t
+    [ div
+      [ css
+        [ property "margin-top" "env(safe-area-inset-top)"
+        , backgroundColor (colors.typeBackground model.t.primary)
+        , borderBottom3 (px 1) solid (colors.typeBackground model.t.primary)
+        ]
+      ]
+      []
+    , viewTypeHeader model.t
     , viewTabsContainer model
     , viewTypeRelationships model
     ]
@@ -83,14 +91,7 @@ viewTypeHeader t =
       , padding (px 10)
       ]
     ]
-    [ div
-      [ css
-        [ property "margin-top" "env(safe-area-inset-top)"
-        , borderBottom3 (px 1) solid (colors.typeBackground t.primary)
-        ]
-      ]
-      []
-    , a
+    [a
       [ href "/"
       , css
         [ aStyleReset
