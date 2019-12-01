@@ -65,6 +65,8 @@ viewTypeLink t =
       , width (px 60)
       , height (px 60)
       , display inlineFlex
+      , alignItems center
+      , justifyContent center
       ]
     ]
     [ img

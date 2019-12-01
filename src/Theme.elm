@@ -30,6 +30,16 @@ type alias Colors =
   , buttonBackground : Color
   , typeForeground : SubType -> Color
   , typeBackground : SubType -> Color
+  , effectiveAgainst : Color
+  , ineffectiveAgainst : Color
+  , weakAgainst : Color
+  , counters : Color
+  , resistantTo : Color
+  , effectiveAgainstLight : Color
+  , ineffectiveAgainstLight : Color
+  , weakAgainstLight : Color
+  , countersLight : Color
+  , resistantToLight : Color
   }
 
 
@@ -42,6 +52,16 @@ colors =
   , buttonBackground = hex "CCC"
   , typeForeground = getTypeForegroundColor
   , typeBackground = getTypeBackgroundColor
+  , effectiveAgainst = hex "69c423"
+  , ineffectiveAgainst = hex "f78360"
+  , weakAgainst = hex "f9ed63"
+  , resistantTo = hex "f78360"
+  , counters = hex "69c423"
+  , effectiveAgainstLight = hex "69c42355"
+  , ineffectiveAgainstLight = hex "f7836055"
+  , weakAgainstLight = hex "f9ed6355"
+  , resistantToLight = hex "f7836055"
+  , countersLight = hex "69c42355"
   }
 
 
@@ -52,7 +72,7 @@ getTypeForegroundColor t =
 
 getTypeBackgroundColor : SubType -> Color
 getTypeBackgroundColor t =
-  hex (getTypeColor t ++ "55")
+  hex (getTypeLightColor t)
 
 
 getTypeColor : SubType -> String
@@ -94,4 +114,45 @@ getTypeColor t =
       "ed95e0"
     Dark ->
       "5b5467"
+
+
+getTypeLightColor : SubType -> String
+getTypeLightColor t =
+  case t of
+    Normal ->
+      "DDDFDF"
+    Fighting ->
+      "F1C0C9"
+    Flying ->
+      "dce5f6"
+    Poison ->
+      "e7cbef"
+    Ground ->
+      "f2d6c6"
+    Rock ->
+      "eee9d9"
+    Bug ->
+      "dcebb9"
+    Ghost ->
+      "cacee8"
+    Steel ->
+      "c6dbe0"
+    Fire ->
+      "FFDEC6"
+    Water ->
+      "c6def2"
+    Grass ->
+      "c9e8c7"
+    Electric ->
+      "fbf1c0"
+    Psychic ->
+      "fdd0d2"
+    Ice ->
+      "d2f0ec"
+    Dragon ->
+      "ACD1EA"
+    Fairy ->
+      "f9dcf5"
+    Dark ->
+      "c8c6cc"
 

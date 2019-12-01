@@ -50,8 +50,7 @@ viewApp : (a -> msg) -> List (Attribute a) -> List (Html a) -> Html msg
 viewApp toMsg attrs body =
   div
     []
-    [ viewHeader
-    , map toMsg (viewBody attrs body)
+    [ map toMsg (viewBody attrs body)
     ]
 
 
@@ -66,7 +65,6 @@ viewHeader =
         , paddingTop (px 22)
         , paddingBottom (px 20)
         , margin zero
-        , marginBottom (px 25)
         ]
       ]
       [ a
